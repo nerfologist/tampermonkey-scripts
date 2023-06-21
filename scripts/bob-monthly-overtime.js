@@ -90,11 +90,12 @@ function deletePreviousOvertime() {
 
 function appendOvertime() {
     deletePreviousOvertime();
-    const overtime = document.createElement('div');
     const summaryContainer = document.querySelector('b-summary-insights');
+    const overtime = summaryContainer.querySelector('b-label-value:last-child').cloneNode(true);
+
     overtime.id = 'overtime';
-    overtime.innerHTML = getOvertime().toString() + '<br>Overtime';
-    overtime.style.fontSize = '16px';
+    overtime.querySelector('h6 span').innerHTML = getOvertime().toString();
+    overtime.querySelector('p span').innerHTML = 'Overtime';
     summaryContainer.appendChild(overtime);
 }
 
