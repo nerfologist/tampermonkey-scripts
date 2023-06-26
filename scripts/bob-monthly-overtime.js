@@ -1,3 +1,5 @@
+let sheetData = null;
+
 class Time {
     constructor(hours, minutes, positive = true) {
         this.hours = hours || 0;
@@ -27,7 +29,7 @@ class Time {
         const totalMinutes = highestTime - lowestTime;
         let subtractHours = Math.floor(totalMinutes / 60);
         let subtractMinutes = Math.abs(totalMinutes % 60);
-  
+
         return new Time(subtractHours, subtractMinutes, thisTotalMinutes === highestTime);
     }
 
@@ -63,6 +65,15 @@ function getDaysWorked() {
     }
 }
 
+function getWeekDaysWorked() {
+  const weekendDaysWorked = sheetData
+    .attendance
+    .filter(({ exceptions }) => exceptions.workedOnNonWorkingDay)
+    .length
+
+  return getDaysWorked() - weekendDaysWorked;
+}
+
 function getTotalWorkedTime() {
     const hoursWorkedString = getBValueLabel('hours worked').querySelector('h6').innerText;
 
@@ -81,7 +92,7 @@ function getTotalWorkedTimeUntilYesterday() {
 }
 
 function getOvertime() {
-    return getTotalWorkedTimeUntilYesterday().subtract(new Time(getDaysWorked() * 8, 0));
+    return getTotalWorkedTimeUntilYesterday().subtract(new Time(getWeekDaysWorked() * 8, 0));
 }
 
 function deletePreviousOvertime() {
@@ -103,12 +114,18 @@ function waitForPageRender() {
     let resolvePromise;
     const promise = new Promise(resolve => { resolvePromise = resolve });
     const interval = setInterval(() => {
-        if (getBValueLabel('hours worked')) {
+        if (getBValueLabel('hours worked') && sheetData !== null) {
             resolvePromise();
             clearInterval(interval);
         }
     }, 1000);
     return promise;
+}
+
+function fetchSheetData() {
+  fetch("https://app.hibob.com/api/attendance/my/sheets/0")
+    .then(res => res.json())
+    .then(json => { sheetData = json });
 }
 
 function run() {
@@ -118,5 +135,6 @@ function run() {
 (function() {
     'use strict';
 
+    fetchSheetData();
     waitForPageRender().then(run);
 })();
