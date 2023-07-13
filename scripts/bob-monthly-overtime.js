@@ -30,7 +30,11 @@ class Time {
         let subtractHours = Math.floor(totalMinutes / 60);
         let subtractMinutes = Math.abs(totalMinutes % 60);
 
-        return new Time(subtractHours, subtractMinutes, thisTotalMinutes === highestTime);
+        return new Time(
+            subtractHours,
+            subtractMinutes,
+            thisTotalMinutes === highestTime
+        );
     }
 
     isZero() {
@@ -38,7 +42,7 @@ class Time {
     }
 
     toString() {
-        const hours = Math.abs(this.hours)
+        const hours = Math.abs(this.hours);
         const minutes = Math.abs(this.minutes);
         const hoursString = hours.toString().padStart(2, '0');
         const minutesString = Math.floor(minutes).toString().padStart(2, '0');
@@ -49,14 +53,17 @@ class Time {
 }
 
 function getBValueLabel(innerText) {
-   const infoContainers = Array.from(document.querySelectorAll('b-label-value'))
-   return infoContainers.find((el) => {
-       return el.innerHTML.toLowerCase().includes(innerText);
-   });
+    const infoContainers = Array.from(
+        document.querySelectorAll('b-label-value')
+    );
+    return infoContainers.find((el) => {
+        return el.innerHTML.toLowerCase().includes(innerText);
+    });
 }
 
 function getDaysWorked() {
-    const daysWorkedString = getBValueLabel('days worked').querySelector('h6').innerText;
+    const daysWorkedString =
+        getBValueLabel('days worked').querySelector('h6').innerText;
 
     const daysWorked = parseInt(daysWorkedString);
     if (getTodayWorkedTime().isZero()) {
@@ -67,22 +74,24 @@ function getDaysWorked() {
 }
 
 function getWeekDaysWorked() {
-  const weekendDaysWorked = sheetData
-    .attendance
-    .filter(({ exceptions }) => exceptions.workedOnNonWorkingDay)
-    .length
+    const weekendDaysWorked = sheetData.attendance.filter(
+        ({ exceptions }) => exceptions.workedOnNonWorkingDay
+    ).length;
 
-  return getDaysWorked() - weekendDaysWorked;
+    return getDaysWorked() - weekendDaysWorked;
 }
 
 function getTotalWorkedTime() {
-    const hoursWorkedString = getBValueLabel('hours worked').querySelector('h6').innerText;
+    const hoursWorkedString =
+        getBValueLabel('hours worked').querySelector('h6').innerText;
 
     return Time.parse(hoursWorkedString);
 }
 
 function getTodayWorkedTime() {
-    const hoursWorkedContainers = Array.from(document.querySelectorAll('[col-id="totalHoursDisplay"]'));
+    const hoursWorkedContainers = Array.from(
+        document.querySelectorAll('[col-id="totalHoursDisplay"]')
+    );
     const hoursWorkedTodayString = hoursWorkedContainers[1].innerText;
 
     return Time.parse(hoursWorkedTodayString);
@@ -93,7 +102,9 @@ function getTotalWorkedTimeUntilYesterday() {
 }
 
 function getOvertime() {
-    return getTotalWorkedTimeUntilYesterday().subtract(new Time(getWeekDaysWorked() * 8, 0));
+    return getTotalWorkedTimeUntilYesterday().subtract(
+        new Time(getWeekDaysWorked() * 8, 0)
+    );
 }
 
 function deletePreviousOvertime() {
@@ -103,7 +114,9 @@ function deletePreviousOvertime() {
 function appendOvertime() {
     deletePreviousOvertime();
     const summaryContainer = document.querySelector('b-summary-insights');
-    const overtime = summaryContainer.querySelector('b-label-value:last-child').cloneNode(true);
+    const overtime = summaryContainer
+        .querySelector('b-label-value:last-child')
+        .cloneNode(true);
 
     overtime.id = 'overtime';
     overtime.querySelector('h6 span').innerHTML = getOvertime().toString();
@@ -113,7 +126,9 @@ function appendOvertime() {
 
 function waitForPageRender() {
     let resolvePromise;
-    const promise = new Promise(resolve => { resolvePromise = resolve });
+    const promise = new Promise((resolve) => {
+        resolvePromise = resolve;
+    });
     const interval = setInterval(() => {
         if (getBValueLabel('hours worked') && sheetData !== null) {
             resolvePromise();
@@ -124,16 +139,18 @@ function waitForPageRender() {
 }
 
 function fetchSheetData() {
-  fetch("https://app.hibob.com/api/attendance/my/sheets/0")
-    .then(res => res.json())
-    .then(json => { sheetData = json });
+    fetch('https://app.hibob.com/api/attendance/my/sheets/0')
+        .then((res) => res.json())
+        .then((json) => {
+            sheetData = json;
+        });
 }
 
 function run() {
     appendOvertime();
 }
 
-(function() {
+(function () {
     'use strict';
 
     fetchSheetData();
