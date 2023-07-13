@@ -8,6 +8,7 @@
   "license": "MIT",
   "private": false,
   "devDependencies": {
+    "eslint": "^8.44.0",
     "prettier": "^3.0.0"
   }
 }
