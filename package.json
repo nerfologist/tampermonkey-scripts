@@ -6,5 +6,8 @@
   "repository": "git@github.com:nerfologist/tampermonkey-scripts.git",
   "author": "Luca Landa <lucalanda@hotmail.it>",
   "license": "MIT",
-  "private": false
+  "private": false,
+  "devDependencies": {
+    "prettier": "^3.0.0"
+  }
 }
